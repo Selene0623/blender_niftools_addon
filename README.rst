@@ -46,5 +46,6 @@ Please check `this temporary guide <https://github.com/niftools/blender_niftools
 Credits
 -------
 
+* Forked from `WhipCream4K/blender_niftools_addon <https://github.com/WhipCream4K/blender_niftools_addon>`_ (itself a fork of the upstream niftools project).
 * Thanks to the niftools community and original project maintainers (Pao et al.) for the core addon.
 * NiBillboardNode bug report and testing by `a user <session-ses_1b62.md>`_ — their investigation identified the baked rotation issue that was fixed in the NiBillboardNode export path (rotation zeroed to identity so the game engine's billboard effect can handle camera-facing dynamically).
