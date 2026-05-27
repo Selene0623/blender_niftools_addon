@@ -93,7 +93,7 @@ class ExportBlockRegistry:
         @return: The newly created block."""
         try:
             block = NifFormat.niobject_map[block_type](NifData.data)
-        except AttributeError:
+        except (AttributeError, KeyError):
             raise io_scene_niftools.utils.logging.NifError(f"'{block_type}': Unknown block type (this is probably a bug).")
         return self.register_block(block, b_obj)
 
@@ -159,7 +159,7 @@ class ExportBlockRegistry:
         if b_obj:
             try:
                 longname = b_obj.niftools.longname
-            except:
+            except AttributeError:
                 pass
             if not longname:
                 longname = block_store._get_unique_name(b_obj.name)

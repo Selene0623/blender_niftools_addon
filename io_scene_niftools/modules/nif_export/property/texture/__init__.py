@@ -97,7 +97,7 @@ class TextureSlotManager:
             try:
                 # ignore the "UV" prefix
                 return int(uv_name[2:])
-            except:
+            except (ValueError, TypeError, IndexError):
                 return 0
         elif isinstance(uv_node, bpy.types.ShaderNodeTexCoord):
             return "REFLECT"
@@ -114,7 +114,7 @@ class TextureSlotManager:
             if not isinstance(combine_node, bpy.types.ShaderNodeCombineXYZ):
                 combine_node = None
                 NifLog.warn(f"Found node with name 'Combine UV0', but it was of the wrong type.")
-        except:
+        except KeyError:
             # if there is a combine node, it does not have the standard name
             combine_node = None
             NifLog.warn(f"Did not find node with 'Combine UV0' name.")

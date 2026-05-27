@@ -117,8 +117,9 @@ class TransformAnimation(Animation):
         kf_root.unknown_int_1 = 1
         kf_root.weight = 1.0
         # Restore cycle_type from import if available, otherwise use export option
-        if "nif_cycle_type" in b_action:
-            kf_root.cycle_type = NifClasses.CycleType(b_action["nif_cycle_type"])
+        nif_cycle_type = getattr(b_action, "nif_cycle_type", None)
+        if nif_cycle_type is not None:
+            kf_root.cycle_type = NifClasses.CycleType(nif_cycle_type)
             NifLog.info(f"Restored cycle_type from import: {kf_root.cycle_type}")
         elif hasattr(NifOp.props, 'cycle_type'):
             kf_root.cycle_type = getattr(NifClasses.CycleType, NifOp.props.cycle_type)

@@ -104,7 +104,7 @@ class Object:
         # there is only one root object so that will be our final root
         if len(root_objects) == 1:
             b_obj = root_objects[0]
-            self.export_node(b_obj, None, n_node_type=b_obj.niftools.nodetype)
+            self.export_node(b_obj, None)
 
         # there is more than one root object so we create a meta root
         else:

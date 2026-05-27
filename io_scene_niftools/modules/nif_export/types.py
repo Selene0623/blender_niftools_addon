@@ -100,8 +100,8 @@ def export_range_lod_data(n_node, b_obj):
     n_node.reset_field("lod_levels")
     n_range_data.reset_field("lod_levels")
     for b_child, n_lod_level, n_rd_lod_level in zip(b_children, n_node.lod_levels, n_range_data.lod_levels):
-        n_lod_level.near_extent = b_child["near_extent"]
-        n_lod_level.far_extent = b_child["far_extent"]
+        n_lod_level.near_extent = b_child.get("near_extent", 0.0)
+        n_lod_level.far_extent = b_child.get("far_extent", 0.0)
         n_rd_lod_level.near_extent = n_lod_level.near_extent
         n_rd_lod_level.far_extent = n_lod_level.far_extent
 

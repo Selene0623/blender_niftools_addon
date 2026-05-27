@@ -257,7 +257,7 @@ class TextureWriter:
             elif n_texture:
                  try:
                      srctex.file_name = TextureWriter.export_texture_filename(n_texture)
-                 except:
+                 except Exception:
                      pass
 
         # Log the texture name for debugging

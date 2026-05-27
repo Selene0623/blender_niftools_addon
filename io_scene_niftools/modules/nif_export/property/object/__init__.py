@@ -294,7 +294,7 @@ class ObjectDataProperty:
                         if found_bsx:
                             raise NifError("Multiple objects have BSXFlags. Only one onject may contain this data")
                         else:
-                            found_bxs = True
+                            found_bsx = True
                             bsx.integer_data = root_object.niftools.bsxflags
 
                 # many Oblivion nifs have a UPB, but export is disabled as

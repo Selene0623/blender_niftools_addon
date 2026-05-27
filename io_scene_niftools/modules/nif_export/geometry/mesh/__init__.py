@@ -633,6 +633,10 @@ class Mesh:
                 NifLog.error(f"[NORMAL EXPORT] Normals could not be computed for '{b_mesh.name}' ({ex}). Exporting without normals.")
                 normal = False
 
+        # tangents require normals; disable tangents if normals failed
+        if tangent and not normal:
+            tangent = False
+
         if uv:
             uv_layers = []
             for layer in b_mesh.uv_layers:
@@ -1099,7 +1103,7 @@ class Mesh:
             elif bpy.context.scene.niftools_scene.game in ('EMPIRE_EARTH_II',):
                 trishape.flags = 0x0016
             elif bpy.context.scene.niftools_scene.game in ('DIVINITY_2',):
-                if trishape.name.lower[-3:] in ("med", "low"):
+                if trishape.name.lower()[-3:] in ("med", "low"):
                     trishape.flags = 0x0014
                 else:
                     trishape.flags = 0x0016

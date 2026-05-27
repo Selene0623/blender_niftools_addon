@@ -79,6 +79,14 @@ class CommonDevOperator:
         subtype="FILE_PATH",
         options={'HIDDEN'})
 
+    # Optional file path for debug log output.
+    log_file_path: bpy.props.StringProperty(
+        name="Log File Path",
+        description="File path for writing debug logs. Leave empty to disable file logging",
+        maxlen=1024,
+        default="",
+        subtype="FILE_PATH")
+
     # Used for checking equality between floats.
     epsilon: bpy.props.FloatProperty(
         name="Epsilon",

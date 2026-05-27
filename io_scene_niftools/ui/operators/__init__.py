@@ -71,6 +71,7 @@ class OperatorCommonDevPanel(OperatorSetting, Panel):
 
         layout.prop(operator, "pyffi_log_level")
         layout.prop(operator, "plugin_log_level")
+        layout.prop(operator, "log_file_path")
         layout.prop(operator, "epsilon")
 
 
