@@ -202,3 +202,12 @@ python311_embed/
 
 dist_obfuscated/
 *.zip
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# OpenCode session files
+session-ses_*.md
