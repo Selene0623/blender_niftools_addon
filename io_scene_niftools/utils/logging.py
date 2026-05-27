@@ -61,21 +61,29 @@ class NifLog:
     op = _MockOperator()
 
     @staticmethod
+    def _report(level, message):
+        """Call op.report() safely, falling back to MockOperator if the operator has been destroyed."""
+        try:
+            NifLog.op.report(level, message)
+        except ReferenceError:
+            _MockOperator().report(level, message)
+
+    @staticmethod
     def debug(message):
         """Report a debug message."""
-        NifLog.op.report({'DEBUG'}, str(message))
+        NifLog._report({'DEBUG'}, str(message))
         logging.getLogger("niftools").debug(str(message))
 
     @staticmethod
     def info(message):
         """Report an informative message."""
-        NifLog.op.report({'INFO'}, str(message))
+        NifLog._report({'INFO'}, str(message))
         logging.getLogger("niftools").info(str(message))
 
     @staticmethod
     def warn(message):
         """Report a warning message."""
-        NifLog.op.report({'WARNING'}, str(message))
+        NifLog._report({'WARNING'}, str(message))
         logging.getLogger("niftools").warning(str(message))
 
     @staticmethod
@@ -91,7 +99,7 @@ class NifLog:
 
             The :ref:`error reporting <dev-design-error-reporting>` design.
         """
-        NifLog.op.report({'ERROR'}, message)
+        NifLog._report({'ERROR'}, message)
         logging.getLogger("niftools").error(str(message))
         return {'FINISHED'}
 

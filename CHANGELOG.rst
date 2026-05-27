@@ -1,5 +1,21 @@
+Version v1.1.0
+==============
+
+- Fixed 11 NIF export bugs:
+  * Removed override of n_node_type that caused KeyError crash
+  * Fixed str.lower() vs str.lower mismatch causing TypeError  
+  * Fixed variable typo (found_bxs instead of found_bsx)
+  * Fixed undefined loop_normals when normal calculation fails
+  * Added missing KeyError handling in block_registry
+  * Fixed 4 bare except: clauses
+  * Fixed dict-style bpy.props access (use setattr/getattr instead)
+  * Fixed normal calculation on evaluated meshes in Blender 5.x
+  * Fixed false "No UV map" warnings from uv_layer_stencil check
+  * Added file logging option to CommonDevOperator
+  * Fixed ReferenceError during unregister (stale NifLog.op reference)
+
 Version v0.1.1
-===============
+==============
 
 - #591 Expansion of DisplayList processing and small fixes.
     - Rigged meshes with DisplayLists will now have functional weights.

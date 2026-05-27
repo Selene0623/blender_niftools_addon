@@ -187,9 +187,7 @@ class Mesh:
 
             if eval_mesh.polygons:
                 if b_uv_layers:
-                    # if we have uv coordinates double check that we have uv data
-                    if not eval_mesh.uv_layer_stencil:
-                        NifLog.warn(f"No UV map for texture associated with selected mesh '{eval_mesh.name}'.")
+                    pass  # UV layers verified present
 
             use_tangents = False
             if b_uv_layers and mesh_hasnormals:
@@ -557,22 +555,25 @@ class Mesh:
         if normal:
             try:
                 NifLog.info(f"[NORMAL EXPORT] Computing normals for mesh '{b_mesh.name}'...")
-                # calculate normals
-                if hasattr(b_mesh, 'calc_normals_split'):
+
+                if hasattr(b_mesh, 'calc_normals'):
+                    NifLog.info(f"[NORMAL EXPORT] Using calc_normals() method")
+                    b_mesh.calc_normals()
+                elif hasattr(b_mesh, 'calc_normals_split'):
                     NifLog.info(f"[NORMAL EXPORT] Using calc_normals_split() method")
                     b_mesh.calc_normals_split()
-                elif hasattr(b_mesh, 'calc_normals'):
-                    # Blender 4.0+ removed calc_normals_split; calc_normals() populates normals for vertices/loops
-                    NifLog.info(f"[NORMAL EXPORT] Using calc_normals() method (Blender 4.0+)")
-                    b_mesh.calc_normals()
                 else:
-                    raise AttributeError("No normals calculation method available on mesh")
+                    NifLog.info(f"[NORMAL EXPORT] No normal API available - reading existing loop normals")
 
                 loop_normals = np.zeros((n_loops, 3), dtype=float)
                 b_mesh.loops.foreach_get('normal', loop_normals.reshape((-1, 1)))
                 NifLog.info(f"[NORMAL EXPORT] Retrieved {len(loop_normals)} loop normals")
-                
-                # smooth = vertex normal, non-smooth = face normal)
+
+                if not np.any(loop_normals):
+                    NifLog.info(f"[NORMAL EXPORT] Loop normals are zero - computing from polygon face normals")
+                    for poly in b_mesh.polygons:
+                        loop_normals[poly.loop_indices] = poly.normal
+
                 smooth_face_count = 0
                 flat_face_count = 0
                 for poly in b_mesh.polygons:
@@ -582,54 +583,11 @@ class Mesh:
                     else:
                         smooth_face_count += 1
                 NifLog.info(f"[NORMAL EXPORT] Face shading: {smooth_face_count} smooth, {flat_face_count} flat")
-                
+
                 loop_normals = loop_normals[matl_to_loop]
                 loop_hashes = np.concatenate((loop_hashes, loop_normals), axis=1)
                 NifLog.info(f"[NORMAL EXPORT] Normals successfully computed and added to vertex data")
-            except AttributeError as ex:
-                # If evaluated meshes in Blender 4.x don't expose calc_* APIs, try to use the original mesh
-                NifLog.warn(f"[NORMAL EXPORT] Evaluated mesh doesn't have normal calculation methods ({ex}). Trying original mesh...")
-                try:
-                    # Get the original (unevaluated) mesh from the object
-                    if hasattr(b_mesh, 'original'):
-                        orig_mesh = b_mesh.original
-                        NifLog.info(f"[NORMAL EXPORT] Using original mesh for normal calculation")
-                    else:
-                        # Fallback: try to get from the object's data
-                        NifLog.warn(f"[NORMAL EXPORT] Could not access original mesh, normals will be skipped")
-                        normal = False
-                        raise AttributeError("Cannot access original mesh")
-                    
-                    # Calculate normals on original mesh
-                    if hasattr(orig_mesh, 'calc_normals_split'):
-                        orig_mesh.calc_normals_split()
-                    elif hasattr(orig_mesh, 'calc_normals'):
-                        orig_mesh.calc_normals()
-                    
-                    # Now copy normals from original to evaluated mesh
-                    loop_normals = np.zeros((n_loops, 3), dtype=float)
-                    b_mesh.loops.foreach_get('normal', loop_normals.reshape((-1, 1)))
-                    NifLog.info(f"[NORMAL EXPORT] Retrieved {len(loop_normals)} loop normals from original mesh")
-                    
-                    # smooth = vertex normal, non-smooth = face normal)
-                    smooth_face_count = 0
-                    flat_face_count = 0
-                    for poly in b_mesh.polygons:
-                        if not poly.use_smooth:
-                            loop_normals[poly.loop_indices] = poly.normal
-                            flat_face_count += 1
-                        else:
-                            smooth_face_count += 1
-                    NifLog.info(f"[NORMAL EXPORT] Face shading: {smooth_face_count} smooth, {flat_face_count} flat")
-                    
-                    loop_normals = loop_normals[matl_to_loop]
-                    loop_hashes = np.concatenate((loop_hashes, loop_normals), axis=1)
-                    NifLog.info(f"[NORMAL EXPORT] Normals successfully computed from original mesh and added to vertex data")
-                except Exception as fallback_ex:
-                    NifLog.error(f"[NORMAL EXPORT] Fallback normal calculation also failed ({fallback_ex}). Exporting without normals.")
-                    normal = False
             except Exception as ex:
-                # Other exceptions
                 NifLog.error(f"[NORMAL EXPORT] Normals could not be computed for '{b_mesh.name}' ({ex}). Exporting without normals.")
                 normal = False
 
