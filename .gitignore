@@ -204,7 +204,7 @@ dist_obfuscated/
 *.zip
 
 # macOS
-.DS_Store
+**/.DS_Store
 .AppleDouble
 .LSOverride
 Icon
