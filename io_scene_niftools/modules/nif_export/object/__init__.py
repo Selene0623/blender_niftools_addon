@@ -38,6 +38,9 @@
 # ***** END LICENSE BLOCK *****
 
 import bpy
+import mathutils
+
+from nifgen.formats.nif import classes as NifClasses
 
 from io_scene_niftools.modules.nif_export import types
 from io_scene_niftools.modules.nif_export.animation.transform import TransformAnimation
@@ -128,7 +131,7 @@ class Object:
             if not mat: continue
                 
             # Check node tree for image texture with Alpha != NONE
-            if mat.use_nodes and mat.node_tree:
+            if mat.node_tree:
                 for node in mat.node_tree.nodes:
                     if isinstance(node, bpy.types.ShaderNodeTexImage):
                         if node.image and getattr(node.image, 'alpha_mode', 'NONE') != 'NONE':
@@ -215,7 +218,16 @@ class Object:
         # and fill in this node's non-trivial values
         node.name = block_store.get_full_name(b_obj)
         self.set_node_flags(b_obj, node)
-        math.set_object_matrix(b_obj, node)
+        if isinstance(node, NifClasses.NiBillboardNode):
+            # NiBillboardNode rotation must be identity - the billboard mode
+            # handles camera-facing orientation dynamically at runtime.
+            # Preserve translation and scale to keep the node's world position.
+            b_matrix = math.get_object_bind(b_obj)
+            loc, _, scale = b_matrix.decompose()
+            b_matrix = mathutils.Matrix.LocRotScale(loc, mathutils.Quaternion(), scale)
+            math.set_b_matrix_to_n_block(b_matrix, node)
+        else:
+            math.set_object_matrix(b_obj, node)
 
         # export object animation
         self.transform_anim.export_transforms(node, b_obj, b_action)

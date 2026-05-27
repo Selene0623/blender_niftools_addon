@@ -8,7 +8,7 @@
 - Build, install, and distribution helpers live in `install/`, `bin/`, `dist_obfuscated/`, and `dependencies/`.
 
 ## How to answer questions
-- Gather evidence from project files first; rely on blender 4.5's documentation or online niftools documentation only when necessary.
+- Gather evidence from project files first; rely on blender 5.0's documentation or online niftools documentation only when necessary.
 - Explain conclusions by citing the most relevant file paths.
 - Provide the correct reference point for each claim (file path, and line/section when helpful).
 - Prefer primary sources: `io_scene_niftools/` for behavior, `docs/` for docs, and `CHANGELOG.rst` for history.
@@ -37,3 +37,22 @@
 - Integration tests should follow the `test.SingleNif` template with `n_create_data`, `n_check_data`, `b_create_data`, and `b_check_data`, and document features while writing Blender creation steps (see `docs/development/testframework/design/integration.rst`).
 - Configure git `core.autocrlf` to avoid line-ending churn across platforms (see `docs/development/setup/sourcecode.rst`).
 - Prefer `Operator.report` over raising exceptions in operators so tests can catch failures (see `docs/development/design/issues.rst`).
+
+## Blender 5.0 compatibility
+
+- **Minimum Blender version**: `io_scene_niftools/__init__.py:51` requires `(5, 0, 0)`.
+- **Dict-style property access removed**: Properties defined by `bpy.props` no longer support `obj["key"]` or `obj.get("key")`. Use `setattr`/`getattr` instead. Fixed in:
+  - `modules/nif_import/property/shader/__init__.py:143` — `b_mat.niftools_shader[name] = True` → `setattr`
+  - `modules/nif_export/property/shader/__init__.py:168` — `b_mat.niftools_shader.get(sf_flag)` → `getattr`
+- **`use_nodes` always True/deprecated**: Always check `mat.node_tree` directly instead of `mat.use_nodes and mat.node_tree`. Fixed in:
+  - `nif_export/object/__init__.py:134` — `_is_obj_transparent`
+  - `nif_export/property/texture/__init__.py:150` — `get_used_textslots`
+  - `nif_export/property/object/__init__.py:164` — `export_alpha_property`
+  - `ui/material.py:107` — panel poll
+  - `modules/nif_import/property/nodes_wrapper/__init__.py:158` — removed `use_nodes = True` set (no-op)
+
+## NiBillboardNode behavior
+
+- **Export detection** (`io_scene_niftools/modules/nif_export/types.py:64-65`): Objects with a `TRACK_TO` constraint are exported as `NiBillboardNode`.
+- **Export rotation fix** (`io_scene_niftools/modules/nif_export/object/__init__.py:221-228`): NiBillboardNode rotation is zeroed to identity during export. The Track To constraint in Blender bakes a rotation to face the camera, but the game engine's billboard effect handles this dynamically. Only translation and scale are preserved from the Blender object matrix. This prevents billboards from pointing at the scene root in-game.
+- **Import**: `io_scene_niftools/modules/nif_import/object/types.py:76-92` creates a `TRACK_TO` constraint on the imported object targeting a Camera. `billboard_mode` field is not imported/exported — defaults to `ALWAYS_FACE_CAMERA`.

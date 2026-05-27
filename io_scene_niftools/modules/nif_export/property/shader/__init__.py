@@ -165,7 +165,7 @@ class BSShaderProperty:
         b_flag_list = b_mat.niftools_shader.bl_rna.properties.keys()
         for sf_flag in flags.__members__:
             if sf_flag in b_flag_list:
-                b_flag = b_mat.niftools_shader.get(sf_flag)
+                b_flag = getattr(b_mat.niftools_shader, sf_flag, None)
                 if b_flag:
                     setattr(flags, sf_flag, True)
                 else:

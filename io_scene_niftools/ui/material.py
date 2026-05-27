@@ -104,7 +104,7 @@ class TextureEmbeddingPanel(Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.material and context.material.use_nodes
+        return context.material and context.material.node_tree is not None
 
     def draw(self, context):
         layout = self.layout

@@ -140,4 +140,4 @@ class BSShader(ABC):
     def import_flags(b_mat, flags):
         for name in type(flags).__members__:
             if getattr(flags, name):
-                b_mat.niftools_shader[name] = True
+                setattr(b_mat.niftools_shader, name, True)

@@ -161,7 +161,7 @@ class ObjectProperty:
         if bpy.context.scene.niftools_scene.game == 'ZONE4':
             # ZONE4 Strict Check: Only look at Texture Alpha Mode (User Request)
             has_alpha_texture = False
-            if b_mat.use_nodes and b_mat.node_tree:
+            if b_mat.node_tree:
                  for node in b_mat.node_tree.nodes:
                      if isinstance(node, bpy.types.ShaderNodeTexImage):
                          if node.image and getattr(node.image, 'alpha_mode', 'NONE') != 'NONE':

@@ -155,7 +155,6 @@ class NodesWrapper:
 
     def clear_default_nodes(self):
         self.b_mat.use_backface_culling = True
-        self.b_mat.use_nodes = True
         self.tree = self.b_mat.node_tree
         # clear default nodes
         for node in self.tree.nodes:

@@ -147,7 +147,7 @@ class TextureSlotManager:
     @staticmethod
     def get_used_textslots(b_mat):
         used_slots = []
-        if b_mat is not None and b_mat.use_nodes:
+        if b_mat is not None and b_mat.node_tree:
             used_slots = [node for node in b_mat.node_tree.nodes if isinstance(node, bpy.types.ShaderNodeTexImage)]
         return used_slots
 
