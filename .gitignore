@@ -211,3 +211,6 @@ Icon
 
 # OpenCode session files
 session-ses_*.md
+
+# OpenCode agent guidance (local config, not for repo)
+AGENTS.md
